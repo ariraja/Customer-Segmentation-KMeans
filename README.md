@@ -55,7 +55,7 @@ At this stage, the project covers **data preparation, feature engineering, RFM c
 - Python 3.12+
 - Clone the repository:
 ```
-git clone <paste_your_repo_url_here>
+git clone https://github.com/ari-raja/customer-segmentation.git
 ```
 - Install required packages:
 ```
