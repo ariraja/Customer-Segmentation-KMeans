@@ -1,0 +1,78 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: retail_postgres
+    environment:
+      POSTGRES_USER: retail
+      POSTGRES_PASSWORD: retail
+      POSTGRES_DB: retail_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - retail_net
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: retail_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    networks:
+      - retail_net
+
+  spark:
+    image: bitnami/spark:3.5.0
+    container_name: retail_spark
+    environment:
+      - SPARK_MODE=standalone
+    ports:
+      - "8080:8080"  # Spark Master UI
+      - "7077:7077"  # Spark Master Port
+    networks:
+      - retail_net
+
+  airflow:
+    image: apache/airflow:2.9.1
+    container_name: retail_airflow
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
+      AIRFLOW__WEBSERVER__RBAC: 'true'
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+    ports:
+      - "8081:8080"
+    command: ["standalone"]
+    depends_on:
+      - postgres
+    networks:
+      - retail_net
+
+  python_app:
+    build: ./app
+    container_name: retail_python
+    volumes:
+      - ./app:/app
+      - ./data:/data
+    networks:
+      - retail_net
+    depends_on:
+      - postgres
+      - spark
+      - airflow
+
+volumes:
+  postgres_data:
+
+networks:
+  retail_net:
