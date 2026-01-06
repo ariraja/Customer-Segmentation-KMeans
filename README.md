@@ -111,6 +111,8 @@ Each customer receives a cluster label (unsupervised).
 
 ### 📈 Results & Insights
 
+![KMeans Clustering 3D plot](/img/output.png)
+
 The clustering reveals four distinct customer profiles:
 - Cluster 0: One-shot or lost customers (low frequency, low monetary, high recency)
 - Cluster 1: New or early-stage customers (recent purchases, limited history)
